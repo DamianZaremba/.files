@@ -1,0 +1,9 @@
+[user]
+	name = Damian Zaremba
+	email = damian@damianzaremba.co.uk
+[core]
+	editor = vim
+[color]
+	branch = auto
+	status = auto
+	diff = auto
