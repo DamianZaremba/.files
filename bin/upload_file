@@ -21,18 +21,18 @@ def upload_file(file_path):
 
 	file_name = os.path.basename(file_path)
 	file_content = open(file_path, "rb").read()
-	
+
 	body = []
 	body.append("--" + BOUNDARY)
 	body.append('Content-Disposition: form-data; name="upload"')
 	body.append('')
 	body.append('')
-	
+
 	body.append("--" + BOUNDARY)
 	body.append('Content-Disposition: form-data; name="file"')
 	body.append('')
 	body.append(file_name)
-	
+
 	body.append("--" + BOUNDARY)
 	body.append('Content-Disposition: form-data; name="key"')
 	body.append('')
@@ -43,12 +43,12 @@ def upload_file(file_path):
 	body.append('Content-Type: %s' % file_content_type(file_name))
 	body.append('')
 	body.append(file_content)
-	
+
 	body.append("--" + BOUNDARY + "--")
 	body.append('')
-	
+
 	post_data = CRLF.join(body)
-	
+
 	request = httplib.HTTP(SERVER)
 	request.putrequest('POST', PUBLISH_PATH)
 	request.putheader('Host', SERVER)
@@ -64,7 +64,7 @@ def upload_file(file_path):
 		return False
 	else:
 		return request.file.read()
-	
+
 def file_content_type(file_name):
 	return mimetypes.guess_type(file_name)[0] or 'application/octet-stream'
 
