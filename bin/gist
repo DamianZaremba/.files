@@ -1,0 +1,109 @@
+#!/usr/bin/env perl
+# gist v1.0
+# gist.github.com submission script
+#
+# (c) 2009 <grawity@gmail.com>
+# Released under WTFPL v2 <http://sam.zoy.org/wtfpl/>
+
+use warnings;
+use strict;
+use utf8;
+
+use Getopt::Long;
+use File::Basename;
+use LWP::UserAgent;
+
+sub usage {
+	print "Usage:\n";
+	print "\tgist [-p] [-n|--name foo] < file\n";
+	print "\tgist [-p] [-a|--add-remote] file [file2 file3 ...]\n";
+	return 2;
+}
+
+sub get_github_auth {
+	my $user = `git config --global github.user`;
+	my $token = `git config --global github.token`;
+
+	if ($token =~ /^!(.+)/) {
+		$token = `$1`;
+		$? and die "gist: could not query GitHub token: '$1' failed\n";
+	}
+
+	chomp ($user, $token);
+	return $user eq ""? () : (login => $user, token => $token);
+}
+
+sub build_post_data {
+	my ($private, $filename, @files) = @_;
+
+	my %data = get_github_auth;
+	$data{action_button} = "private" if $private;
+
+	my $i = 1;
+	if ($#files == -1) {
+		$data{"file_name[gistfile$i]"} = $filename;
+		$data{"file_ext[gistfile$i]"} = "";
+		do {
+			local $/ = undef;
+			$data{"file_contents[gistfile$i]"} = <STDIN>;
+		}
+	} else {
+		if ($filename ne "") {
+			print STDERR "warning: reading from files; option --name will be ignored\n";
+		}
+
+		for my $filename (@files) {
+			$data{"file_name[gistfile$i]"} = basename($filename);
+			$data{"file_ext[gistfile$i]"} = "";
+	
+			open my $fh, q{<}, $filename or die "Cannot open file $filename\n";
+			do {
+				local $/ = undef;
+				$data{"file_contents[gistfile$i]"} = <$fh>;
+			};
+			close $fh;
+			$i++;
+		}
+	}
+
+	return \%data;
+}
+
+my $private = 0;
+my $filename = "";
+my $add_git_remote = 0;
+
+GetOptions(
+	"p|private" => \$private,
+	"n|name=s" => \$filename,
+	"a|add-remote" => \$add_git_remote,
+) or exit usage;
+
+my $data = build_post_data($private, $filename, @ARGV);
+
+my $ua = LWP::UserAgent->new;
+my $response = $ua->post(
+	"https://gist.github.com/gists",
+	"Content-Type" => "application/x-www-form-urlencoded; charset=utf-8",
+	Content => $data);
+
+if ($response->code == 302) {
+	my $url = $response->header("Location");
+
+	$url =~ /https?:\/\/(gist\.github\.com)\/(.+)$/;
+	my $git_public_url = "git://$1/$2.git";
+	my $git_private_url = "git\@$1:$2.git";
+
+	print "gist page: $url\n";
+	print "private: $git_private_url\n";
+	print "public: $git_public_url\n" unless $private;
+
+	if ($add_git_remote) {
+		system "git remote add gist '$git_private_url'";
+		system "git push gist master --force";
+	}
+} else {
+	print "gist error: ", $response->header("status"), "\n";
+	print $response->decoded_content;
+	exit 1;
+}
