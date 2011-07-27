@@ -7,3 +7,6 @@
 	branch = auto
 	status = auto
 	diff = auto
+[github]
+	user = damianzaremba
+	token =
