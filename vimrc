@@ -145,7 +145,6 @@ Bundle 'fugitive.vim'
 Bundle 'Markdown'
 Bundle 'Markdown-syntax'
 Bundle 'taglist.vim'
-Bundle ''
 
 "----- Tag list stuff -----
 
@@ -161,7 +160,7 @@ let Tlist_Exit_OnlyWindow = 1
 " Jump to a tag when single clicked on
 let Tlist_Use_SingleClick = 1
 
-" taglist width
+" Taglist width
 let Tlist_Inc_Winwidth = 0
 
 "----- Auto run commands -----
