@@ -19,3 +19,6 @@ alias vi='vim'
 
 # Useful alises
 alias sprunge="curl -F 'sprunge=<-' http://sprunge.us"
+
+# I hate nano
+export EDITOR="vim"
