@@ -15,3 +15,4 @@ then
 fi
 
 rsync -avr --exclude='update.sh' --exclude='README' ~/.files/* ~
+rsync -avr --exclude='.git' ~/.files/.* ~
