@@ -5,9 +5,11 @@ then
 	git pull;
 else
 	git clone git://github.com/DamianZaremba/.files.git;
-	cd ~/.files/;
 fi
+
+cd ~/.files/
 git submodule update
+cd ~
 
 if [ ! -d ".files/" ];
 then
