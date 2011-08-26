@@ -3,10 +3,11 @@ if [ -d ".files/.git" ];
 then
 	cd ~/.files/;
 	git pull;
-	cd ~;
 else
 	git clone git://github.com/DamianZaremba/.files.git;
+	cd ~/.files/;
 fi
+git submodule update
 
 if [ ! -d ".files/" ];
 then
