@@ -3,12 +3,12 @@ if [ -d ".files/.git" ];
 then
 	cd ~/.files/;
 	git pull;
+	git submodule update
 else
 	git clone git://github.com/DamianZaremba/.files.git;
+	cd ~/.files/
+	git submodule update --init
 fi
-
-cd ~/.files/
-git submodule update
 cd ~
 
 if [ ! -d ".files/" ];
@@ -18,4 +18,4 @@ then
 fi
 
 rsync -avr --exclude='update.sh' --exclude='README' ~/.files/* ~
-rsync -avr --exclude='.git' ~/.files/.* ~
+rsync -avr --exclude='.git' --exclude='.gitmodules' ~/.files/.* ~
